@@ -78,10 +78,10 @@ class Segment:
 
 
 if __name__ == "__main__":
-    a_val = 3.0
-    b_val = 5.0
-    eps_val = 0.7
-    beta_val = 0.3
+    a_val = 0.0
+    b_val = 2.0
+    eps_val = 0.5
+    beta_val = 0.1
     
     Segment.calc(a_val, b_val, eps_val, beta_val)
     
