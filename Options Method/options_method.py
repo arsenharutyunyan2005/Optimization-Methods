@@ -85,21 +85,19 @@ class Options:
     def plot_results(cls, a, b, eps, n, someXValues, functionValues,
                      xMinF, yMinF, realRootX, realRootY):
 
-        x_smooth = np.linspace(a - 0.5, b + 0.5, 500)
+        x_smooth = np.linspace(a - 0.1, b + 0.1, 500)
         f_lamb   = sp.lambdify(cls.xSymbol, cls.FunctionSymbolic(cls.xSymbol), "numpy")
         y_smooth = f_lamb(x_smooth)
         someXFloat          = [float(xi) for xi in someXValues]
         functionValuesFloat = [float(v)  for v  in functionValues]
 
-        BG     = "#0c0c10"
-        PANEL  = "#11111a"
-        GOLD1  = "#c8922a"
-        GOLD2  = "#f2c96e"
-        ACCENT = "#e8b84b"
-        TEXT   = "#ede3cc"
-        MUTED  = "#5a5244"
-        RED    = "#cc4455"
-        GREEN  = "#44bb88"
+        BG     = "#f8f9fc"
+        PANEL  = "#eef1f7"
+        GOLD1  = "#1a3caa"
+        GOLD2  = "#2e9de4"
+        ACCENT = "#e8420a"
+        TEXT   = "#0d1117"
+        MUTED  = "#8896aa"
 
         plt.rcParams.update({
             "font.family":     "monospace",
@@ -112,19 +110,20 @@ class Options:
         fig, ax = plt.subplots(figsize=(11, 6.5), facecolor=BG)
         ax.set_facecolor(PANEL)
         for spine in ax.spines.values():
-            spine.set_edgecolor("#252520")
-        ax.grid(True, color="#1c1c18", linewidth=0.7, linestyle="-")
+            spine.set_edgecolor(MUTED)
+        ax.grid(True, color=MUTED, linewidth=0.5, linestyle="-", alpha=0.35)
         ax.set_axisbelow(True)
 
+        
         # ── Zoom y-axis ───────────────────────────────────────────────
         y_lo = y_smooth.min() - 0.3
-        y_hi = max(cls.Function(a), cls.Function(b)) * 1.15
+        y_hi = max(cls.Function(a), cls.Function(b)) * 0.55
         ax.set_ylim(y_lo, y_hi)
 
         # ── Gradient curve ────────────────────────────────────────────
         pts  = np.array([x_smooth, y_smooth]).T.reshape(-1, 1, 2)
         segs = np.concatenate([pts[:-1], pts[1:]], axis=1)
-        cmap_curve = LinearSegmentedColormap.from_list("gc", ["#7a4800", GOLD1, GOLD2])
+        cmap_curve = LinearSegmentedColormap.from_list("gc", [GOLD2, GOLD1])
         lc = LineCollection(segs, cmap=cmap_curve,
                             norm=plt.Normalize(y_smooth.min(), y_smooth.max()),
                             linewidth=2.5, zorder=3)
@@ -132,33 +131,35 @@ class Options:
         ax.add_collection(lc)
 
         ax.fill_between(x_smooth, y_smooth, y_lo,
-                        alpha=0.06, color=GOLD1, zorder=1)
+                        alpha=0.08, color=GOLD1, zorder=1)
 
         # ── Division points ───────────────────────────────────────────
-        ax.scatter(someXFloat, functionValuesFloat,
-                   color=RED, s=30, zorder=6,
-                   edgecolors="#0c0c10", linewidths=0.5)
+        n_pts = len(someXFloat)
+        cmap_pts = LinearSegmentedColormap.from_list("pts", ["#90caf9", GOLD1])
+        sc = ax.scatter(someXFloat, functionValuesFloat,
+                        c=list(range(n_pts)), cmap=cmap_pts, vmin=0, vmax=max(n_pts - 1, 1),
+                        s=50, zorder=6, edgecolors=TEXT, linewidths=0.8)
 
         for k, (px, py) in enumerate(zip(someXFloat, functionValuesFloat)):
-            ax.annotate(str(k), (px, py),
+            ax.annotate(str(k+1), (px, py),
                         xytext=(5, 6), textcoords="offset points",
-                        fontsize=7, color=MUTED, zorder=7)
+                        fontsize=7, color=TEXT, zorder=7)
 
         # ── x_min point ───────────────────────────────────────────────
-        ax.scatter([xMinF], [yMinF], marker="o", s=35, color=ACCENT,
-                   edgecolors="#fffbe8", linewidths=1.0, zorder=8)
+        ax.scatter([xMinF], [yMinF], marker="o", s=60, color=ACCENT,
+                   edgecolors=TEXT, linewidths=1.0, zorder=8)
 
         # ── Real root line + marker ───────────────────────────────────
-        ax.axvline(realRootX, color=GREEN, lw=1.5, ls="--", alpha=0.8, zorder=5,
+        ax.axvline(realRootX, color=ACCENT, lw=1.6, ls="--", alpha=0.9, zorder=5,
                    path_effects=[pe.withStroke(linewidth=4, foreground=BG)])
 
-        ax.scatter([realRootX], [realRootY], marker="o", s=35,
-                   color=GREEN, edgecolors="#fffbe8", linewidths=1.0, zorder=9)
+        ax.scatter([realRootX], [realRootY], marker="o", s=60,
+                   color=ACCENT, edgecolors=TEXT, linewidths=1.0, zorder=9)
 
         ax_yrange = y_hi - y_lo
         ann_y = y_lo + ax_yrange * 0.72
         ann_x = realRootX + (b - a) * 0.12
-        if ann_x + (b - a) * 0.25 > b + 0.5:
+        if ann_x + (b - a) * 0.25 > b + 0.3:
             ann_x = realRootX - (b - a) * 0.38
 
         ax.annotate(
@@ -166,20 +167,27 @@ class Options:
             xy=(realRootX, realRootY),
             xytext=(ann_x, ann_y),
             fontsize=8.5, color=TEXT,
-            bbox=dict(boxstyle="round,pad=0.5", fc="#15140e",
-                      ec=GREEN, lw=1.0, alpha=0.95),
-            arrowprops=dict(arrowstyle="-|>", color=GREEN, lw=1.1,
+            bbox=dict(boxstyle="round,pad=0.5", fc=BG,
+                      ec=GOLD1, lw=1.0, alpha=0.95),
+            arrowprops=dict(arrowstyle="-|>", color=ACCENT, lw=1.1,
                             connectionstyle="arc3,rad=0.2"),
             zorder=10,
         )
 
+        # ── Colorbar ──────────────────────────────────────────────────
+        cbar = fig.colorbar(sc, ax=ax, pad=0.015, fraction=0.025)
+        cbar.set_label("division point", fontsize=8, color=MUTED)
+        cbar.outline.set_edgecolor(MUTED)
+        cbar.ax.yaxis.set_tick_params(color=MUTED, labelsize=7)
+        plt.setp(cbar.ax.yaxis.get_ticklabels(), color=MUTED)
+
         # ── Title + subtitle ──────────────────────────────────────────
         ax.set_title("OPTIONS METHOD",
-                     fontsize=14, fontweight="bold", color=GOLD2, pad=28,
+                     fontsize=14, fontweight="bold", color=GOLD1, pad=28,
                      path_effects=[pe.withStroke(linewidth=3, foreground=BG)])
         ax.text(0.5, 1.018,
                 f"f(x) = eˣ - 4x + x²   |   ε = {eps}   |   n = {n} points",
-                transform=ax.transAxes, ha="center", fontsize=8, color=GOLD2)
+                transform=ax.transAxes, ha="center", fontsize=8, color=MUTED)
 
         ax.set_xlabel("x", fontsize=10, labelpad=6)
         ax.set_ylabel("f(x)", fontsize=10, labelpad=6)
@@ -190,24 +198,24 @@ class Options:
             Line2D([0], [0], color=GOLD1, lw=2.2,
                    label="f(x) = eˣ - 4x + x²"),
             Line2D([0], [0], marker="o", color="none",
-                   markerfacecolor=RED, markeredgecolor="#0c0c10",
+                   markerfacecolor="#90caf9", markeredgecolor=TEXT,
                    markersize=7, label="division points  (x[k])"),
             Line2D([0], [0], marker="o", color="none",
-                   markerfacecolor=ACCENT, markeredgecolor="#fffbe8",
+                   markerfacecolor=ACCENT, markeredgecolor=TEXT,
                    markersize=7, label=f"x_min = {xMinF:.4f}   →   f(x_min) = {yMinF:.4f}"),
-            Line2D([0], [0], color=GREEN, lw=1.4, ls="--",
+            Line2D([0], [0], color=ACCENT, lw=1.4, ls="--",
                    label=f"real root = {realRootX:.4f}"),
             Line2D([0], [0], marker="o", color="none",
-                   markerfacecolor=GREEN, markeredgecolor="#fffbe8",
+                   markerfacecolor=ACCENT, markeredgecolor=TEXT,
                    markersize=7, label=f"f(real root) = {realRootY:.4f}"),
         ]
         ax.legend(handles=legend_handles, fontsize=8, loc="upper left",
-                  facecolor="#0f0f14", edgecolor="#252520",
-                  labelcolor=TEXT, framealpha=0.9)
+                  facecolor=BG, edgecolor=MUTED,
+                  labelcolor=TEXT, framealpha=0.95)
 
         # ── φ watermark ───────────────────────────────────────────────
         ax.text(0.965, 0.95, "φ", transform=ax.transAxes,
-                fontsize=60, color=GOLD1, alpha=0.055,
+                fontsize=60, color=GOLD1, alpha=0.06,
                 ha="right", va="top", fontweight="bold")
 
         plt.tight_layout()
