@@ -14,11 +14,11 @@ class Segment:
 
     @staticmethod
     def new_x1(a, b, beta):
-        return (a + b) / 2 - beta
+        return (a + b - beta) / 2 
 
     @staticmethod
     def new_x2(a, b, beta):
-        return (a + b) / 2 + beta
+        return (a + b + beta) / 2 
 
     @staticmethod
     def is_done(a, b, eps):
