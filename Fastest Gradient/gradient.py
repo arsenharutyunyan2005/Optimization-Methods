@@ -1,9 +1,9 @@
 import sympy as sp
 
-x1, x2 = sp.symbols('x1 x2')
+x1, x2 ,x3,x4= sp.symbols('x1 x2 x3 x4')
 
-def Func(x1, x2):
-    return x1**2 - 2*x1*x2 + 6*x2**2 + x1 - x2
+def Func(x1, x2,x3,x4):
+    return 0.5*(5*x1** 2+ 6*x2**2 + 2*x2*x3 + 7*x3**2 + 5*x4**2) + 5*x1+13*x2+9*x3-5*x4
 
 def IsSatisfied(expr, point: dict, threshold=0.01):
     listOfPartial = []
@@ -25,6 +25,8 @@ def FindOptimalStep(expr, point: dict, partials: list):
     new_point = {
         vars[0]: point[vars[0]] - alpha * float(partials[0].subs(point)),
         vars[1]: point[vars[1]] - alpha * float(partials[1].subs(point)),
+        vars[2]: point[vars[2]] - alpha * float(partials[2].subs(point)),
+        vars[3]: point[vars[3]] - alpha * float(partials[3].subs(point)),
     }
 
     phi = expr.subs(new_point)
@@ -59,6 +61,8 @@ def SteepestDescent(expr, point: dict, threshold=0.01, max_iter=1000):
         point = {
             vars[0]: float(point[vars[0]]) - alpha_opt * df1,
             vars[1]: float(point[vars[1]]) - alpha_opt * df2,
+            vars[2]: float(point[vars[2]]) - alpha_opt * float(partials[2].subs(point)),
+            vars[3]: float(point[vars[3]]) - alpha_opt * float(partials[3].subs(point)),
         }
     else:
         print(f"\nDid not converge in {max_iter} iterations")
@@ -68,7 +72,7 @@ def SteepestDescent(expr, point: dict, threshold=0.01, max_iter=1000):
     return point
 
 
-expr = Func(x1, x2)
-point = {x1: 1, x2: 1}
+expr = Func(x1, x2, x3, x4)
+point = {x1: -1, x2: 0, x3: -3, x4: 0}
 
-result = SteepestDescent(expr, point)
+result = SteepestDescent(expr, point, threshold=1e-3)
