@@ -14,11 +14,7 @@ This repository contains Python implementations of various optimization and simu
 
 - **DP/** – Dynamic Programming approach to optimization problems.
 
-- **Weather Simulation/** – Discrete-time Markov Chain weather simulation. Models sunny, cloudy, and rainy days using a transition matrix. Includes:
-  - 365-day path simulation starting from Sunny
-  - 1000-run Monte Carlo estimation of empirical state fractions
-  - Analytical stationary distribution by solving πP = π
-  - Comparison of empirical vs theoretical results
+- **Airport Runway Traffic Model/** – The Airport Runway Traffic process is modeled as a Markov chain with 6 states
 
 ## How to Run
 
@@ -28,7 +24,7 @@ Each method can be run individually, for example:
 python "Golden Ratio Method/golden_ratio_method.py"
 python "Options Method/options_method.py"
 python "Section Division Method/section_division_method.py"
-python "Weather Simulation/weather_forecast.py"
+python "Airport Runway Traffic Model/airport-runway-traffic-model.py"
 ```
 
 Or run all at once:
